@@ -1,0 +1,29 @@
+apiserver/paasng/paasng/accessories/servicehub/constants.py
+  999b083098252f9e 89,91-99
+apiserver/paasng/paasng/accessories/servicehub/models.py
+  999b083098252f9e 192
+apiserver/paasng/paasng/accessories/servicehub/migrations/0014_remoteserviceengineappattachment_service_instance_status.py
+  999b083098252f9e 1-26
+apiserver/paasng/paasng/accessories/servicehub/remote/manager.py
+  999b083098252f9e 113,183-185,237-262,266,269-270,282,288-290,292-293,295-305,307-309,311-330,332-343,345-348,387-388,767-773,784-785,836,996
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.19",
+  "base_commit_sha": "8cce1c4c560a9bd713e5cb7528f252100bc0fc12",
+  "prompts": {
+    "999b083098252f9e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d281e-4348-72b2-bb0c-eecb100c13d9",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655 <xiaoj655@gmail.com>",
+      "messages": [],
+      "total_additions": 150,
+      "total_deletions": 23,
+      "accepted_lines": 144,
+      "overriden_lines": 2
+    }
+  }
+}
