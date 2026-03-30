@@ -1,0 +1,47 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "a5280a46d081c69d83306d9d9db3f4443dcf3c5c",
+  "prompts": {
+    "0a4191584acf38c4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d29fa-b3b6-7a21-85a9-f3b013360702",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655 <xiaoj655@gmail.com>",
+      "messages": [],
+      "total_additions": 273,
+      "total_deletions": 2,
+      "accepted_lines": 269,
+      "overriden_lines": 0
+    },
+    "53799cecca4f0dac": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d2e58-de41-7dc0-9441-43084d57a39f",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655 <xiaoj655@gmail.com>",
+      "messages": [],
+      "total_additions": 22,
+      "total_deletions": 14,
+      "accepted_lines": 7,
+      "overriden_lines": 8
+    },
+    "9d92b7adb09afc0d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d3d63-2981-7e22-b47a-43812f567c76",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655 <xiaoj655@gmail.com>",
+      "messages": [],
+      "total_additions": 24,
+      "total_deletions": 16,
+      "accepted_lines": 3,
+      "overriden_lines": 6
+    }
+  }
+}
