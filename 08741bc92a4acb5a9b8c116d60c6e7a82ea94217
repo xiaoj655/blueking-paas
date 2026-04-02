@@ -1,0 +1,63 @@
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/ascode/rules_tpl/rabbitmq_instance_down.yaml.j2
+  399d752523a026b2 1-29
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/config/constants.py
+  399d752523a026b2 57-81
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/ascode/rules_tpl/high_rabbitmq_queue_usage.yaml.j2
+  399d752523a026b2 1-29
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/ascode/rules_tpl/high_rabbitmq_dlx_queue_messages.yaml.j2
+  399d752523a026b2 1-29
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/ascode/rules_tpl/high_rabbitmq_queues_usage.yaml.j2
+  399d752523a026b2 1-29
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/config/app_rule.py
+  399d752523a026b2 73-82
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/config/entities.py
+  399d752523a026b2 26-33
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/ascode/rules_tpl/high_rabbitmq_connections_usage.yaml.j2
+  399d752523a026b2 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "08741bc92a4acb5a9b8c116d60c6e7a82ea94217",
+  "prompts": {
+    "0e22b2412d75ea6b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d4c56-de31-7302-acee-7c29fbe7f59e",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    },
+    "2f46f6c3a7a73dd2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d4d86-e54a-7270-bba8-492b7f79a48a",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    },
+    "399d752523a026b2": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2b1161cc0ffekSqYpe3XgY5sbt",
+        "model": "minimax-cn/MiniMax-M2.7-highspeed"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 223,
+      "total_deletions": 36,
+      "accepted_lines": 188,
+      "overriden_lines": 0
+    }
+  }
+}
