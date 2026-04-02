@@ -1,0 +1,77 @@
+apiserver/paasng/paasng/platform/agent_sandbox/management/commands/cleanup_expired_sandboxes.py
+  354a2c8dede0cae7 58
+  b7883215555bc922 1-24,26-38,40,42,45-46,49,52-57,59,61-66,68-72,74-76,79-80
+  2f8831c9226ca45d 39,41,43-44,47-48,50-51,67,73,78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "fdc5e565fb0cc1dc5f8fd14d060cbb438b387007",
+  "prompts": {
+    "0e22b2412d75ea6b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d4c56-de31-7302-acee-7c29fbe7f59e",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 48,
+      "total_deletions": 2,
+      "accepted_lines": 35,
+      "overriden_lines": 0
+    },
+    "2f46f6c3a7a73dd2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d4d86-e54a-7270-bba8-492b7f79a48a",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 3,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    },
+    "2f8831c9226ca45d": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2b1db99a1ffeutpD7ml6F6we4U",
+        "model": "zai/glm-5"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 14,
+      "total_deletions": 18,
+      "accepted_lines": 11,
+      "overriden_lines": 0
+    },
+    "354a2c8dede0cae7": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2b1e174d6ffeM8URR5TF99EAzI",
+        "model": "zai/glm-5"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 7,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "b7883215555bc922": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2b1f47acfffePcl2OWijrWL6sG",
+        "model": "openrouter/stepfun/step-3.5-flash:free"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 335,
+      "total_deletions": 12,
+      "accepted_lines": 65,
+      "overriden_lines": 3
+    }
+  }
+}
