@@ -1,0 +1,56 @@
+apiserver/paasng/tests/api/platform/agent_sandbox/test_sandbox.py
+  c4453cdd6b53c241 18,69-96
+apiserver/paasng/paasng/platform/agent_sandbox/serializers.py
+  c4453cdd6b53c241 18-19,23,25,63-83,91
+apiserver/paasng/paasng/platform/agent_sandbox/sandbox.py
+  2fab891bfe7b01f4 43,84-85,94
+  c4453cdd6b53c241 22,72
+apiserver/paasng/paasng/platform/agent_sandbox/views.py
+  c4453cdd6b53c241 88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "e5fc4c8904e9cf0533515062a129cf1e412bfc21",
+  "prompts": {
+    "15d4e0250c13e238": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d65ac-e247-7872-8aa8-58650fe4b396",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 938,
+      "total_deletions": 0,
+      "accepted_lines": 938,
+      "overriden_lines": 0
+    },
+    "2fab891bfe7b01f4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d65ca-f31b-79d2-aea0-fe9127c0d8ef",
+        "model": "gpt-5.4"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 2,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    },
+    "c4453cdd6b53c241": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d65ca-f567-7c71-92d5-0cbe906e42ae",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 60,
+      "total_deletions": 11,
+      "accepted_lines": 59,
+      "overriden_lines": 0
+    }
+  }
+}
