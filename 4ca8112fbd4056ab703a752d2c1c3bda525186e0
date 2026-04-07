@@ -1,0 +1,47 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "4ca8112fbd4056ab703a752d2c1c3bda525186e0",
+  "prompts": {
+    "509f9fa76c14439f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d6707-8d34-7f81-b65c-57b9deb3f380",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "8038e60026dc5d02": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d66f6-87a7-77b0-a327-aafa753d5aab",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 62,
+      "overriden_lines": 0
+    },
+    "9652f8b2d794975b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d6711-083c-7560-982b-891e55cd85cc",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
