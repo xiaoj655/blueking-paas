@@ -1,0 +1,47 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "d6214073b1b34e96d74fd86188a68303e33010c3",
+  "prompts": {
+    "509f9fa76c14439f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d6707-8d34-7f81-b65c-57b9deb3f380",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "8038e60026dc5d02": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d66f6-87a7-77b0-a327-aafa753d5aab",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 62,
+      "overriden_lines": 0
+    },
+    "fc9d08c09962df56": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d671d-109b-74e3-bafd-d9b96d32bb14",
+        "model": "gpt-5.4"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
