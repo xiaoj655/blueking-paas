@@ -1,0 +1,23 @@
+apiserver/paasng/tests/paasng/accessories/log/test_tenant_log_config.py
+  8465da6adae16f24 39,52,74,76,96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "3045c5e9f23bcaa9192120db44b16931b19d28c8",
+  "prompts": {
+    "8465da6adae16f24": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d66dc-228b-7c00-bfe5-2c86d818300e",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 61,
+      "accepted_lines": 5,
+      "overriden_lines": 1
+    }
+  }
+}
