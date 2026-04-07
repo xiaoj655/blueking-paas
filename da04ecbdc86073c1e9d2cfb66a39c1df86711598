@@ -1,0 +1,34 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "da04ecbdc86073c1e9d2cfb66a39c1df86711598",
+  "prompts": {
+    "8038e60026dc5d02": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d66f6-87a7-77b0-a327-aafa753d5aab",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 63,
+      "total_deletions": 2,
+      "accepted_lines": 62,
+      "overriden_lines": 0
+    },
+    "f8245a94c7ad9179": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d66fd-d807-76c0-9a3d-d8cb1cd5cdd7",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 1,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
