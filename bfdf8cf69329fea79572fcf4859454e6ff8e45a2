@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "bfdf8cf69329fea79572fcf4859454e6ff8e45a2",
+  "prompts": {
+    "01eddd6ffa039a91": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d6760-6760-7da0-af0e-aae02290cc6b",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 62,
+      "total_deletions": 2,
+      "accepted_lines": 62,
+      "overriden_lines": 0
+    }
+  }
+}
