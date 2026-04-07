@@ -1,0 +1,36 @@
+apiserver/paasng/paasng/accessories/log/init_config.py
+  c4cbdea729db5f26 70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "2c8777acadad3b595378ac696960e007ba9cc58e",
+  "prompts": {
+    "6c1cf9dbbad0ca33": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d66db-e3c7-7ad2-a9cd-e4d5b9ffb175",
+        "model": "gpt-5.4"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 65,
+      "total_deletions": 3,
+      "accepted_lines": 63,
+      "overriden_lines": 0
+    },
+    "c4cbdea729db5f26": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d66ed-ff11-72c0-b094-9c56fe1575f6",
+        "model": "unknown"
+      },
+      "human_author": "xiaoj655",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 3,
+      "accepted_lines": 1,
+      "overriden_lines": 1
+    }
+  }
+}
