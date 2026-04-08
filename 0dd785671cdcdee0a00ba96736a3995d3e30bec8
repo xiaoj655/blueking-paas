@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "0dd785671cdcdee0a00ba96736a3995d3e30bec8",
+  "prompts": {
+    "05ffef674c4fc33e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d6bcf-9d57-7991-aa71-3c9b698737ee",
+        "model": "unknown"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 62,
+      "overriden_lines": 0
+    }
+  }
+}
