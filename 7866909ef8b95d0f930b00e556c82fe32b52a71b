@@ -1,0 +1,62 @@
+apiserver/paasng/tests/paasng/accessories/log/test_tenant_log_config.py
+  accf22129fb7ad5a 19,53-59,61-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "7866909ef8b95d0f930b00e556c82fe32b52a71b",
+  "prompts": {
+    "10718162e797dae3": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7064-3eb1-7780-9a1a-a8de23cc47c5",
+        "model": "unknown"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 62,
+      "overriden_lines": 0
+    },
+    "23807fca02a2472f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d70ef-9edd-70e3-a64b-1713c3bacb63",
+        "model": "unknown"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 59,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    },
+    "5557931fa9026121": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d70e8-5789-78d2-870b-5ff651002045",
+        "model": "unknown"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 136,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    },
+    "accf22129fb7ad5a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d70ef-8bea-70c2-8def-8c79f5a1250c",
+        "model": "gpt-5.4"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 39,
+      "total_deletions": 0,
+      "accepted_lines": 38,
+      "overriden_lines": 1
+    }
+  }
+}
