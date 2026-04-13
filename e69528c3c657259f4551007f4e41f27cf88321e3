@@ -1,0 +1,27 @@
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/config/constants.py
+  af22c72c87bed49c 58
+apiserver/paasng/locale/en/LC_MESSAGES/django.po
+  af22c72c87bed49c 2228-2247
+apiserver/paasng/paasng/misc/monitoring/monitor/alert_rules/ascode/rules_tpl/rabbitmq_instance_down.yaml.j2
+  af22c72c87bed49c 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "e69528c3c657259f4551007f4e41f27cf88321e3",
+  "prompts": {
+    "af22c72c87bed49c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d857d-a122-78b1-9cc6-3477baeb8225",
+        "model": "unknown"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 856,
+      "total_deletions": 3,
+      "accepted_lines": 855,
+      "overriden_lines": 1
+    }
+  }
+}
