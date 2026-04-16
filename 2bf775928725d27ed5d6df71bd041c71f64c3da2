@@ -1,0 +1,41 @@
+apiserver/paasng/paasng/misc/monitoring/monitor/management/commands/recreate_alert_rules.py
+  h_5eb9bd2c117ee2 33-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "2bf775928725d27ed5d6df71bd041c71f64c3da2",
+  "prompts": {
+    "3854a4e3d95f2f13": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d7637-daba-75a2-b86d-4923f7800948",
+        "model": "unknown"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 58,
+      "overriden_lines": 0
+    },
+    "66ff39a905ad7793": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019d9505-ce1d-7e33-a13d-bced2835339b",
+        "model": "unknown"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_5eb9bd2c117ee2": {
+      "author": "Kailong Jiang"
+    }
+  }
+}
