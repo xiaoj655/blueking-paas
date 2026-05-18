@@ -1,0 +1,21 @@
+apiserver/paasng/tests/paasng/accessories/log/test_init_tenantlogconfig_migration.py
+  s_e46806aab056ce::t_849af9a7e56679 1-30,32-83
+apiserver/paasng/paasng/accessories/log/migrations/0009_init_tenantlogconfig_from_deprecated_bklog_config.py
+  s_e46806aab056ce::t_9affe242814d6d 61-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "594f5e85a8fd099f6cb89074f9e26a79db269ad1",
+  "prompts": {},
+  "sessions": {
+    "s_e46806aab056ce": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e5d50be5-918f-4e5c-ba3c-f379f2112050",
+        "model": "default"
+      },
+      "human_author": "Kailong Jiang <xiaoj655@gmail.com>"
+    }
+  }
+}
