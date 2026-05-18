@@ -1,0 +1,14 @@
+apiserver/paasng/paasng/accessories/log/migrations/0009_init_tenantlogconfig_from_deprecated_bklog_config.py
+  h_96d90f9c1c6eda 62-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ff2f96149b74fc16ecd3117256694b7106cd9ee2",
+  "prompts": {},
+  "humans": {
+    "h_96d90f9c1c6eda": {
+      "author": "Kailong Jiang <xiaoj655@gmail.com>"
+    }
+  }
+}
