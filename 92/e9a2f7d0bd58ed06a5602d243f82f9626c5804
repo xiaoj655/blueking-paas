@@ -1,0 +1,23 @@
+apiserver/paasng/paasng/accessories/log/migrations/0009_init_tenantlogconfig_from_deprecated_bklog_config.py
+  3ad714861438e230 62-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "92e9a2f7d0bd58ed06a5602d243f82f9626c5804",
+  "prompts": {
+    "3ad714861438e230": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c5a96d8a-83f3-4800-a03e-c2af6abd3e75",
+        "model": "default"
+      },
+      "human_author": "Kailong Jiang",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 1,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
