@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "cd65a3ac63fc23a6e82140cbb9b46e42a188422a",
+  "prompts": {},
+  "humans": {
+    "h_96d90f9c1c6eda": {
+      "author": "Kailong Jiang <xiaoj655@gmail.com>"
+    }
+  }
+}
