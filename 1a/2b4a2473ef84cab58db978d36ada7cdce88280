@@ -1,0 +1,29 @@
+apiserver/paasng/paasng/accessories/log/shim/setup_bklog_shared.py
+  s_46b90a2d2359d6::t_912da73c1e5c04 178-179
+  s_46b90a2d2359d6::t_c0fdfb05e53073 54-56
+apiserver/paasng/tests/paasng/accessories/log/test_tenant_log_config.py
+  s_46b90a2d2359d6::t_803af4b3a7a0e7 28-30
+  s_46b90a2d2359d6::t_8f3a8ded2cf50c 182
+  s_46b90a2d2359d6::t_b3fec95cccf97f 179-181,183-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "1a2b4a2473ef84cab58db978d36ada7cdce88280",
+  "prompts": {},
+  "humans": {
+    "h_96d90f9c1c6eda": {
+      "author": "Kailong Jiang <xiaoj655@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_46b90a2d2359d6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b0ab7ed5-85c9-4e71-924a-063b6099893c",
+        "model": "default"
+      },
+      "human_author": "Kailong Jiang <xiaoj655@gmail.com>"
+    }
+  }
+}
