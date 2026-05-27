@@ -17,7 +17,7 @@
 
 from django.conf import settings
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -43,7 +43,7 @@ def setup_trace_config():
             sampler=_KNOWN_SAMPLERS[settings.OTEL_SAMPLER],  # type: ignore
         )
     )
-    otlp_exporter = OTLPSpanExporter(endpoint=settings.OTEL_GRPC_URL, insecure=True)
+    otlp_exporter = OTLPSpanExporter(endpoint=settings.OTEL_GRPC_URL)
     span_processor = BatchSpanProcessor(otlp_exporter)
     trace.get_tracer_provider().add_span_processor(span_processor)  # type: ignore
 
