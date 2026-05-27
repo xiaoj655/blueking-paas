@@ -21,7 +21,7 @@ from typing import Sequence
 
 from django.conf import settings
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import ReadableSpan, TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, SpanExporter, SpanExportResult
@@ -78,7 +78,7 @@ def setup_trace_config():
             sampler=_KNOWN_SAMPLERS[settings.OTEL_SAMPLER],  # type: ignore
         )
     )
-    otlp_exporter = _DiagnosticSpanExporter(OTLPSpanExporter(endpoint=settings.OTEL_GRPC_URL))
+    otlp_exporter = _DiagnosticSpanExporter(OTLPSpanExporter(endpoint=settings.OTEL_GRPC_URL, insecure=True))
     span_processor = BatchSpanProcessor(otlp_exporter)
     trace.get_tracer_provider().add_span_processor(span_processor)  # type: ignore
 
