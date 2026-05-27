@@ -15,18 +15,54 @@
 # We undertake not to change the open source license (MIT license) applicable
 # to the current version of the project delivered to anyone in the future.
 
+import logging
+from typing import Sequence
+
 from django.conf import settings
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.sdk.trace import ReadableSpan, TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, SpanExporter, SpanExportResult
 from opentelemetry.sdk.trace.sampling import _KNOWN_SAMPLERS
 
 from .instrumentor import BKAppInstrumentor
 
+logger = logging.getLogger(__name__)
+
+
+def _setup_otel_sdk_logging() -> None:
+    """开启 OpenTelemetry SDK 内部日志（导出重试、队列满等）。"""
+    level_name = getattr(settings, "OTEL_SDK_LOG_LEVEL", "")
+    if not level_name:
+        return
+    level = getattr(logging, str(level_name).upper(), logging.DEBUG)
+    logging.getLogger("opentelemetry").setLevel(level)
+
+
+class _DiagnosticSpanExporter(SpanExporter):
+    """包装 OTLP exporter，记录每次 span 批量上报结果。"""
+
+    def __init__(self, delegate: SpanExporter):
+        self._delegate = delegate
+
+    def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
+        result = self._delegate.export(spans)
+        if result is SpanExportResult.SUCCESS:
+            logger.info("OTLP exported %d span(s) successfully", len(spans))
+        else:
+            logger.warning("OTLP failed to export %d span(s)", len(spans))
+        return result
+
+    def shutdown(self) -> None:
+        self._delegate.shutdown()
+
+    def force_flush(self, timeout_millis: int = 30000) -> bool:
+        return self._delegate.force_flush(timeout_millis)
+
 
 def setup_trace_config():
+    _setup_otel_sdk_logging()
     # local environment use jaeger as trace service is easier
     # docker run -p 16686:16686 -p 6831:6831/udp jaegertracing/all-in-one
 
@@ -43,7 +79,7 @@ def setup_trace_config():
             sampler=_KNOWN_SAMPLERS[settings.OTEL_SAMPLER],  # type: ignore
         )
     )
-    otlp_exporter = OTLPSpanExporter(endpoint=settings.OTEL_GRPC_URL, insecure=True)
+    otlp_exporter = _DiagnosticSpanExporter(OTLPSpanExporter(endpoint=settings.OTEL_GRPC_URL, insecure=True))
     span_processor = BatchSpanProcessor(otlp_exporter)
     trace.get_tracer_provider().add_span_processor(span_processor)  # type: ignore
 
