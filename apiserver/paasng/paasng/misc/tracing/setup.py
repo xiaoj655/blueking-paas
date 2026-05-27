@@ -32,12 +32,8 @@ logger = logging.getLogger(__name__)
 
 
 def _setup_otel_sdk_logging() -> None:
-    """开启 OpenTelemetry SDK 内部日志（导出重试、队列满等）。"""
-    level_name = getattr(settings, "OTEL_SDK_LOG_LEVEL", "")
-    if not level_name:
-        return
-    level = getattr(logging, str(level_name).upper(), logging.DEBUG)
-    logging.getLogger("opentelemetry").setLevel(level)
+    """测试用：开启 OpenTelemetry SDK 内部日志（导出重试、队列满等）。"""
+    logging.getLogger("opentelemetry").setLevel(logging.DEBUG)
 
 
 class _DiagnosticSpanExporter(SpanExporter):
