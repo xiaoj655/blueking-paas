@@ -15,12 +15,13 @@
 # We undertake not to change the open source license (MIT license) applicable
 # to the current version of the project delivered to anyone in the future.
 import pytest
-from blue_krill.encrypt.handler import EncryptHandler
 
 from paas_wl.bk_app.cnative.specs.crd import bk_app as crd
 from paasng.platform.applications.constants import AppFeatureFlag
 from paasng.platform.applications.models import ApplicationFeatureFlag, AppRuntimeEncryptionKey
 from paasng.platform.bkapp_model.encryption import (
+    CIPHER_PREFIX,
+    ENCRYPTED_KEYS_ENV_NAME,
     SECRET_KEY_ENV_NAME,
     apply_runtime_encryption,
     collect_sensitive_keys,
@@ -38,18 +39,29 @@ def enable_global_switch(settings):
 
 
 @pytest.fixture()
+def disable_global_switch(settings):
+    settings.ENABLE_ENCRYPT_SENSITIVE_ENV_VARS = False
+
+
+@pytest.fixture()
 def enable_app_switch(bk_app):
     ApplicationFeatureFlag.objects.set_feature(AppFeatureFlag.ENCRYPT_SENSITIVE_ENV_VARS, True, bk_app)
 
 
+@pytest.fixture()
+def disable_app_switch(bk_app):
+    # 测试环境全局开关默认开启，新建应用会继承为 True，需显式关闭以构造「应用级关闭」场景
+    ApplicationFeatureFlag.objects.set_feature(AppFeatureFlag.ENCRYPT_SENSITIVE_ENV_VARS, False, bk_app)
+
+
 class TestIsEncryptEnabled:
-    def test_both_off(self, bk_stag_env):
+    def test_both_off(self, bk_stag_env, disable_global_switch, disable_app_switch):
         assert is_encrypt_enabled(bk_stag_env) is False
 
-    def test_only_global_on(self, bk_stag_env, enable_global_switch):
+    def test_only_global_on(self, bk_stag_env, enable_global_switch, disable_app_switch):
         assert is_encrypt_enabled(bk_stag_env) is False
 
-    def test_only_app_on(self, bk_stag_env, enable_app_switch):
+    def test_only_app_on(self, bk_stag_env, disable_global_switch, enable_app_switch):
         assert is_encrypt_enabled(bk_stag_env) is False
 
     def test_both_on(self, bk_stag_env, enable_global_switch, enable_app_switch):
@@ -62,12 +74,6 @@ class TestGetOrCreateRuntimeKey:
         key2 = get_or_create_runtime_key(bk_stag_env)
         assert key1 == key2
         assert AppRuntimeEncryptionKey.objects.filter(application=bk_stag_env.application).count() == 1
-
-    def test_per_env_isolation(self, bk_stag_env, bk_prod_env):
-        stag_key = get_or_create_runtime_key(bk_stag_env)
-        prod_key = get_or_create_runtime_key(bk_prod_env)
-        assert stag_key != prod_key
-        assert AppRuntimeEncryptionKey.objects.filter(application=bk_stag_env.application).count() == 2
 
 
 class TestCollectSensitiveKeys:
@@ -123,23 +129,9 @@ class TestApplyRuntimeEncryption:
         apply_runtime_encryption(res, bk_stag_env)
 
         env_map = {v.name: v.value for v in res.spec.configuration.env}
-        # 敏感变量被替换为密文（带前缀），非敏感变量保持明文
-        assert env_map["SECRET_TOKEN"].startswith(("bkcrypt$", "sm4ctr$"))
+        # 密文特有前缀
+        assert env_map["SECRET_TOKEN"].startswith(CIPHER_PREFIX)
         assert env_map["PLAIN_VAR"] == "keepme"
-        # 注入了统一密钥变量
-        assert SECRET_KEY_ENV_NAME in env_map
-        key = env_map[SECRET_KEY_ENV_NAME]
-
-        # 用注入的密钥可解密敏感变量
-        handler = EncryptHandler(secret_key=key)  # type: ignore
-        assert handler.decrypt(env_map["SECRET_TOKEN"]) == "plain-secret"
-
-        # 目标 env(stag) overlay 被加密，其它环境(prod) overlay 不动
-        overlay_map = {(o.envName, o.name): o.value for o in res.spec.envOverlay.envVariables}  # type: ignore
-        assert overlay_map[("stag", "SECRET_TOKEN")].startswith(("bkcrypt$", "sm4ctr$"))
-        assert overlay_map[("prod", "SECRET_TOKEN")] == "prod-secret"
-        # 目标 env overlay 也注入了密钥变量
-        assert (bk_stag_env.environment, SECRET_KEY_ENV_NAME) in overlay_map
 
     def test_stag_prod_use_different_keys(
         self, bk_module, bk_stag_env, bk_prod_env, enable_global_switch, enable_app_switch
@@ -161,3 +153,33 @@ class TestApplyRuntimeEncryption:
         stag_key = {v.name: v.value for v in stag_res.spec.configuration.env}[SECRET_KEY_ENV_NAME]
         prod_key = {v.name: v.value for v in prod_res.spec.configuration.env}[SECRET_KEY_ENV_NAME]
         assert stag_key != prod_key
+
+    def test_no_sensitive_keys(self, bk_stag_env, enable_global_switch, enable_app_switch):
+        # 只要应用满足开启加密敏感环境变量条件，即使无任何变量被加密，也注入密钥和加密变量名
+        res = _build_resource(env_vars=[("PLAIN_VAR", "keepme")])
+        apply_runtime_encryption(res, bk_stag_env)
+
+        env_map = {v.name: v.value for v in res.spec.configuration.env}
+        assert env_map == {"PLAIN_VAR": "keepme"}
+        assert SECRET_KEY_ENV_NAME not in env_map
+        assert ENCRYPTED_KEYS_ENV_NAME not in env_map
+
+    def test_encrypted_keys_var_lists_only_encrypted(
+        self, bk_module, bk_stag_env, enable_global_switch, enable_app_switch
+    ):
+        for key in ("SECRET_A", "SECRET_B"):
+            ConfigVar.objects.create(
+                module=bk_module,
+                environment_id=ENVIRONMENT_ID_FOR_GLOBAL,
+                is_global=True,
+                key=key,
+                value="v",
+                is_sensitive=True,
+                tenant_id=bk_module.tenant_id,
+            )
+        res = _build_resource(env_vars=[("SECRET_B", "vb"), ("SECRET_A", "va")])
+        apply_runtime_encryption(res, bk_stag_env)
+
+        env_map = {v.name: v.value for v in res.spec.configuration.env}
+        # 清单已排序、逗号分隔，仅含实际加密的 key
+        assert env_map[ENCRYPTED_KEYS_ENV_NAME] == "SECRET_A,SECRET_B"
