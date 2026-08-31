@@ -141,7 +141,7 @@ else
   VERSION_NAME="$TAG"
 fi
 
-BODY="$(python3 -c 'import json,sys; print(json.dumps({"revision":sys.argv[1],"version_type":sys.argv[2],"version_name":sys.argv[3]}))' "$REVISION" "$VERSION_TYPE" "$VERSION_NAME")"
+BODY="$(python3 -c 'import json,sys; print(json.dumps({"revision":sys.argv[1],"version_type":sys.argv[2],"version_name":sys.argv[3],"advanced_options":{"image_pull_policy":"IfNotPresent"}}))' "$REVISION" "$VERSION_TYPE" "$VERSION_NAME")"
 
 echo "deploying $APP_CODE module=$MODULE env=$ENV $VERSION_TYPE=$VERSION_NAME revision=$REVISION" >&2
 DEPLOY_JSON="$(run_cli paas deploy_with_module --app_code "$APP_CODE" --module "$MODULE" --env "$ENV" --body "$BODY")"
