@@ -1,6 +1,6 @@
 # bk-cli paas 命令
 
-公共手册。按任务读同级 skill：新建 `bk-cli-paas-create`，部署 `bk-cli-paas-deploy`，变量/服务/查询 `bk-cli-paas-ops`。约定和 Guard 见 [SKILL.md](SKILL.md)。
+这是 [SKILL.md](SKILL.md) 的命令与响应字段参考。进入生命周期阶段后，只读对应章节；执行顺序、默认值和完成条件以阶段手册为准。
 
 全局：`--context` `--dry-run` `--insecure` `-v`。
 
@@ -19,25 +19,35 @@ bk-cli paas list_app_modules --app_code bk-demo
 bk-cli paas create_cloud_native_app --body '{"is_plugin_app":false,"code":"bk-demo","name":"bk-demo","source_config":{"source_init_template":"","source_origin":1,"source_control_type":"tc_git","source_repo_url":"http://<host>/<org>/<repo>.git","source_dir":""},"bkapp_spec":{"build_config":{"build_method":"dockerfile","dockerfile_path":null,"docker_build_args":{}}}}'
 ```
 
-空模板：`source_init_template=""`。已有仓库：**API** 的 `source_repo_url` 用工蜂 http/https clone 地址，不要 `git@`。`dockerfile_path` 空则 `null`。buildpack 时才加 `source_init_template=dj2_with_auth`，去掉 `dockerfile_path` / `docker_build_args`。
+buildpack 使用 `source_init_template=dj2_with_auth`，并去掉 `dockerfile_path` / `docker_build_args`。
 
-平台新建空白仓库（不要传 `source_repo_url`）：
+平台新建空白仓库：
 
 ```bash
 bk-cli paas create_cloud_native_app --body '{"is_plugin_app":false,"code":"bk-demo","name":"bk-demo","source_config":{"source_init_template":"","source_control_type":"tc_git","auto_create_repo":true,"write_template_to_repo":false,"repo_name":"bk-demo","source_origin":1,"source_dir":""},"bkapp_spec":{"build_config":{"build_method":"dockerfile","dockerfile_path":null,"docker_build_args":{}}}}'
 ```
 
-`repo_name` 默认等于 `code`。指定工蜂项目组才加 `repo_group`。空模板必须 `write_template_to_repo=false`。创建后仓库是空的，`get_app_info` 取 `repo_url`，转成 SSH（`git@git.woa.com:<user>/<repo>.git`）再 clone / 补文件 / push 到当前同名分支（`main` 或 `master` 都行）。本地不要用 http(s) clone（无 helper，且 `insteadOf` 可能把 http 改成 https 仍 401）。
-
 ```bash
 bk-cli paas create_module --app_code bk-demo --body '{"name":"api","source_config":{"source_init_template":"","source_origin":1,"source_control_type":"tc_git","source_repo_url":"http://<host>/<org>/<repo>.git","source_dir":""},"bkapp_spec":{"build_config":{"build_method":"dockerfile","dockerfile_path":null,"docker_build_args":{}}}}'
 ```
 
-模块名：小写字母/数字/连字符，最长 16。
+## 工蜂 Git
+
+`get_app_info` 返回的 `repo_url` 和 create 使用的 `source_repo_url` 是给 API 的 http(s) 地址。本地 clone / push 优先 SSH：
+
+`http://git.woa.com/<user>/<repo>.git` → `git@git.woa.com:<user>/<repo>.git`
+
+本地 clone/push 固定使用 SSH；环境可能没有 HTTP credential helper，且全局 `url.*.insteadOf` 可能把 HTTP 改写成 HTTPS 后仍返回 401。
+
+push 被 `committer-check` 拒时读取 push 的 remote 输出。邮箱必须属于工蜂账号，常用格式为 `<rtx>@tencent.com`；rtx 不确定就问用户。先确认 HEAD 由当前任务创建且尚未推送，并取得用户对 amend 的明确授权；否则交付 remote 输出。满足条件后保留现有 git config，仅重写当前这一笔提交：
+
+```bash
+GIT_COMMITTER_NAME="<当前 name>" GIT_COMMITTER_EMAIL="<rtx>@tencent.com" git commit --amend --author="<当前 name> <rtx>@tencent.com" --no-edit
+```
+
+身份重写只使用 `--author`；name 沿用当前 committer，只改邮箱。
 
 ## 环境变量
-
-`environment_name`：`stag` / `prod` / `_global_`。
 
 ```bash
 bk-cli paas list_config_vars --app_code bk-demo --module default
@@ -46,18 +56,15 @@ bk-cli paas set_config_var_value --app_code bk-demo --module default --config_va
 bk-cli paas set_config_var_value --app_code bk-demo --module default --config_var_key SECRET --body '{"environment_name":"prod","value":"secret","is_sensitive":true}'
 ```
 
-`--config_var_key` 是变量名。`--body` 里 `environment_name` 必填。
-
 ## 增强服务
 
 ```bash
 bk-cli paas list_module_services --app_code bk-demo --module default
 bk-cli paas bind_service --body '{"code":"bk-demo","service_id":"946ee404-df67-4013-a92f-9cc116ff50dc","module_name":"default","env_plan_id_map":{"stag":"8c52a7f8-a8ff-47da-b0f0-0ef744b37562","prod":"8c52a7f8-a8ff-47da-b0f0-0ef744b37562"}}'
 bk-cli paas bind_service --body '{"code":"bk-demo","service_id":"<unbound-uuid>","module_name":"default"}'
+bk-cli paas unbind_service --app_code bk-demo --module default --service_id <bound-uuid>
 bk-cli paas get_service_instance_by_module --app_code bk-demo --module default --service_id <uuid>
 ```
-
-GCS-MYSQL 用第一条（`code` 换成目标应用，stag/prod 同一 plan）。其它服务用 `unbound[].uuid`，可不带 plan。`bind_service` 没有 `--app_code`。该网关无 `unbind_service`。
 
 ## 部署
 
@@ -68,10 +75,6 @@ bk-cli paas get_deployment_result --app_code bk-demo --module default --deployme
 bk-cli paas get_deployments_list --app_code bk-demo --module default --environment stag --limit 12 --offset 0
 bk-cli paas streams_history_events --channel_id <deployment_id>
 ```
-
-部署前必须 `get_repo_branches`：`version_name` 用返回的真实分支名（`main` 或 `master` 都可能），`revision` 用同条 `results[].revision`。`channel_id` = `deployment_id`。
-`get_deployment_result` 状态：`pending` / `successful` / `failed` / `interrupted`。Dockerfile 小应用首次构建常见约 30s，每 5s 轮询直到终态，第一次 `pending` 不当失败。
-`status=successful` 时 `error_detail` 可能是 `Rolling upgrade`，只看 `status`。
 
 ## 发布与进程
 

@@ -93,7 +93,7 @@ all_403 = status == 403 or err_code == "1640301" or "1640301" in raw or "app_no_
 if all_403 and "bkpaas3." in url:
     sys.stderr.write(
         "all-API 403 with bkpaas3 host: binary likely missing BK_TE_DOMAIN. "
-        "rebuild with BK_TE_DOMAIN=<internal-domain> make build; do not apply for bkpaas3 permission\n"
+        "rebuild with scripts/install.sh; do not apply for bkpaas3 permission\n"
     )
     sys.exit(1)
 if all_403:

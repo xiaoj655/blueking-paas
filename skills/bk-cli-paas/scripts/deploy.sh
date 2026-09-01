@@ -5,7 +5,7 @@ set -euo pipefail
 APP_CODE=""
 MODULE="default"
 ENV="stag"
-BRANCH="main"
+BRANCH=""
 TAG=""
 REVISION=""
 CONTEXT=""
@@ -15,8 +15,8 @@ TIMEOUT_SEC=900
 usage() {
   cat <<'EOF'
 Usage:
-  deploy.sh --app-code <code> [--module default] [--env stag] \
-            [--branch main | --tag <name>] [--revision <sha>] \
+  deploy.sh --app-code <code> (--branch <name> | --tag <name>) \
+            [--module default] [--env stag] [--revision <sha>] \
             [--context <name>] [--poll-sec 5] [--timeout-sec 900]
 EOF
 }
@@ -42,8 +42,10 @@ if [[ -z "$APP_CODE" ]]; then
   usage
   exit 2
 fi
-if [[ -n "$TAG" ]]; then
-  BRANCH=""
+if [[ -n "$BRANCH" && -n "$TAG" ]]; then
+  echo "--branch and --tag are mutually exclusive" >&2
+  usage
+  exit 2
 fi
 if [[ -z "$BRANCH" && -z "$TAG" ]]; then
   echo "need --branch or --tag" >&2
