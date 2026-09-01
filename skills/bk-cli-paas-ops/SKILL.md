@@ -4,7 +4,6 @@ description: >-
   Configures env vars and add-on services, and queries BlueKing PaaS
   app status via `bk-cli paas`. Use when the user wants to 配环境变量,
   绑定增强服务, 查部署状态, 看进程/日志, 查访问地址, or 列应用/模块/分支.
-  Do not use for 创建应用, 部署, or 应用市场上架.
 ---
 
 # bk-cli paas 运维
@@ -12,7 +11,7 @@ description: >-
 前置：读 [../bk-cli-paas/SKILL.md](../bk-cli-paas/SKILL.md) 的约定 / Guard / Flag。
 写操作前：`../bk-cli-paas/scripts/guard.sh`。命令见 [../bk-cli-paas/commands.md](../bk-cli-paas/commands.md)。
 
-只用 `bk-cli paas`。改变量或绑服务后必须重部署 → `bk-cli-paas-deploy`。`APP_NOT_RELEASED` 不是凭证坏了。
+改变量或绑服务后必须重部署 → `bk-cli-paas-deploy`。`APP_NOT_RELEASED` 不是凭证坏了。
 
 ## 环境变量
 
@@ -29,16 +28,21 @@ bk-cli paas set_config_var_value --app_code bk-demo --module default --config_va
 
 ## 增强服务
 
-`list_module_services` → `unbound[].uuid` → `bind_service`。不编 UUID，不传 `plan_id`。已 `bound` 不绑。解绑仅用户要求。只报凭证 key 名。绑完重部署。
+`list_module_services` → 已 `bound` 不绑。解绑仅用户要求（该网关 `unbind_service` 未注册，报 `1640401`，只能控制台解绑）。只报凭证 key 名。绑完重部署。`bind_service` 没有 `--app_code`。
+
+GCS-MYSQL 直绑（`code` 换成目标应用；不要不带 plan 试，不要只传 stag）：
+
+```bash
+bk-cli paas bind_service --body '{"code":"bk-demo","service_id":"946ee404-df67-4013-a92f-9cc116ff50dc","module_name":"default","env_plan_id_map":{"stag":"8c52a7f8-a8ff-47da-b0f0-0ef744b37562","prod":"8c52a7f8-a8ff-47da-b0f0-0ef744b37562"}}'
+```
+
+其它服务：`unbound[].uuid` → `bind_service`（可不带 plan）。默认绑定报 `CANNOT_BIND_SERVICE` → 不要重试、不要用 plan 名称。让用户控制台抓 `env_plan_id_map` 的 plan UUID 再绑。
 
 ```bash
 bk-cli paas list_module_services --app_code bk-demo --module default
 bk-cli paas bind_service --body '{"code":"bk-demo","service_id":"<unbound-uuid>","module_name":"default"}'
 bk-cli paas get_service_instance_by_module --app_code bk-demo --module default --service_id <uuid>
-bk-cli paas unbind_service --app_code bk-demo --module default --service_id <uuid>
 ```
-
-`service_id` 只用 `unbound[].uuid`。`bind_service` 没有 `--app_code`。
 
 ## 查询
 
