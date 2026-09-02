@@ -15,13 +15,16 @@
 
 ### 绑定
 
-1. 先运行 `list_module_services`，以 `bound` 和 `unbound` 的实际数据选择服务。
-2. 已在 `bound` 中的服务直接满足绑定条件。
-3. GCS-MYSQL 使用 `env_plan_id_map`，`stag` 与 `prod` 同时提供同一个 plan UUID。
-4. 其他服务使用 `unbound[].uuid`；有可用默认方案时可省略 plan。
-5. 绑定后重新运行 `list_module_services`，确认服务进入 `bound`。
+绑定只运行 `scripts/bind_service.py`，不要直接拼 `bind_service --body`。脚本会：
 
-默认绑定返回 `CANNOT_BIND_SERVICE` 时停止该次绑定，请用户从控制台取得 plan UUID 后再执行。
+1. 从 `list_module_services` 精确匹配 `name`、`display_name` 或显式 UUID，不接受猜测的 UUID。
+2. 区分 `bound`、`shared`、`unbound`；已绑定直接完成，共享服务不尝试重复绑定。
+3. 仅对实际返回的 GCS-MySQL UUID 自动补齐已知的 `stag` / `prod` 方案；其他服务由平台选择默认方案。
+4. 写入前运行 Guard，成功后再次查询并确认同一 UUID 已进入 `bound`。
+
+普通绑定、显式单方案和分环境方案的命令见 [commands.md](../commands.md)。“未精确匹配”或“匹配不唯一”时，从脚本输出的候选项请用户确认，不做模糊选择。
+
+默认方案返回 `CANNOT_BIND_SERVICE` 时，当前 CLI 无法列出方案。保留完整错误，请用户从控制台取得 plan UUID，再用 `--plan-id`，或同时提供 `--stag-plan-id` 与 `--prod-plan-id` 重试。
 
 ### 解绑
 

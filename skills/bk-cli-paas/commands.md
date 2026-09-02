@@ -60,11 +60,15 @@ bk-cli paas set_config_var_value --app_code bk-demo --module default --config_va
 
 ```bash
 bk-cli paas list_module_services --app_code bk-demo --module default
-bk-cli paas bind_service --body '{"code":"bk-demo","service_id":"946ee404-df67-4013-a92f-9cc116ff50dc","module_name":"default","env_plan_id_map":{"stag":"8c52a7f8-a8ff-47da-b0f0-0ef744b37562","prod":"8c52a7f8-a8ff-47da-b0f0-0ef744b37562"}}'
-bk-cli paas bind_service --body '{"code":"bk-demo","service_id":"<unbound-uuid>","module_name":"default"}'
+python3 scripts/bind_service.py --app-code bk-demo --module default --service redis
+python3 scripts/bind_service.py --app-code bk-demo --module default --service GCS-MySQL
+python3 scripts/bind_service.py --app-code bk-demo --module default --service redis --plan-id <plan-uuid>
+python3 scripts/bind_service.py --app-code bk-demo --module default --service redis --stag-plan-id <stag-plan-uuid> --prod-plan-id <prod-plan-uuid>
 bk-cli paas unbind_service --app_code bk-demo --module default --service_id <bound-uuid>
 bk-cli paas get_service_instance_by_module --app_code bk-demo --module default --service_id <uuid>
 ```
+
+绑定必须走脚本；`--service` 只做 `name` / `display_name` 精确匹配，也可改用 `--service-id <unbound-uuid>`。加 `--dry-run` 只解析目标并打印请求体，不执行绑定。
 
 ## 部署
 
