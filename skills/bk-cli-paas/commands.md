@@ -72,6 +72,15 @@ bk-cli paas get_service_instance_by_module --app_code bk-demo --module default -
 
 ## 部署
 
+部署前的本地校验，不调用平台，可反复运行：
+
+```bash
+python3 scripts/preflight.py --repo-dir /path/to/repo --module default
+python3 scripts/preflight.py --repo-dir /path/to/repo --build-method buildpack --json
+```
+
+`--build-method` 省略时按仓库里有无 `Dockerfile` 推断；`--dockerfile-path` 用于模块 `dockerfile_path` 不是仓库根 `Dockerfile` 的情况。退出码 0 表示无阻塞项。
+
 ```bash
 bk-cli paas get_repo_branches --app_code bk-demo --module default
 bk-cli paas deploy_with_module --app_code bk-demo --module default --env stag --body '{"revision":"<sha>","version_type":"branch","version_name":"<branches 的 name>","advanced_options":{"image_pull_policy":"IfNotPresent"}}'
