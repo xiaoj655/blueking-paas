@@ -106,12 +106,6 @@ class AppDeclarativeController:
             tenant_id=self.app_tenant_conf.tenant_id,
         )
 
-        try:
-            create_oauth2_client(application.code, application.app_tenant_mode, application.app_tenant_id)
-        except BkOauthClientCodeConflictError:
-            logger.warning(f"OAuth2 client code conflict for application {application.code}")
-            raise error_codes.CANNOT_CREATE_APP_BKAUTH_CONFLICT.f(code=application.code)
-
         self.sync_modules(application, desc.modules)
         default_module = application.get_default_module()
 
@@ -130,6 +124,14 @@ class AppDeclarativeController:
         self.sync_market_fields(application, desc.market)
         self.sync_services_fields(application, desc.modules)
         self.save_description(desc, application, is_creation=True)
+
+        # The oauth2 client is created in an external system and cannot be rolled back
+        # toghther with the DB transaction, so create it at the end
+        try:
+            create_oauth2_client(application.code, application.app_tenant_mode, application.app_tenant_id)
+        except BkOauthClientCodeConflictError:
+            logger.warning(f"OAuth2 client code conflict for application {application.code}")
+            raise error_codes.CANNOT_CREATE_APP_BKAUTH_CONFLICT.f(code=application.code)
         return application
 
     @atomic
