@@ -136,6 +136,17 @@ class PersistentStorageManifestConstructor(ManifestConstructor):
             model_res.spec.storage = storage_spec
 
 
+class RemoveAdditionalSvcConstructor(ManifestConstructor):
+    """Disable the additional service of standalone Redis CRD"""
+
+    def apply_to(self, model_res, plan_config):
+        # reids standalone mode
+        if plan_config.type.lower() == "redis":
+            model_res.spec.kubernetesConfig.service = crd.KubernetesServiceConfig(
+                additional=crd.AdditionalServiceConfig(enabled=False)
+            )
+
+
 def create_redis_base_resource(redis_type: str, name: str) -> Union[crd.RedisResource, crd.RedisReplicationResource]:
     metadata = crd.ObjectMetadata(name=name)
 
@@ -167,6 +178,7 @@ def get_redis_resource(plan_config: RedisPlanConfig) -> Union["crd.RedisResource
         MonitorManifestConstructor(),
         ResourceManifestConstructor(),
         PersistentStorageManifestConstructor(),
+        RemoveAdditionalSvcConstructor(),
     ]
     obj = create_redis_base_resource(plan_config.type, generate_redis_name())
     for builder in builders:
