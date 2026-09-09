@@ -58,6 +58,11 @@ BUILTIN_REPOS = [
     Repo(name=settings.AGENT_SANDBOX_PACKAGE_BUCKET, type=RepositoryType.GENERIC, public=False),
     # Agent Sandbox 产物文件归档仓库(沙箱文件持久化)
     Repo(name=settings.AGENT_SANDBOX_ARTIFACT_BUCKET, type=RepositoryType.GENERIC, public=False),
+    Repo(
+        name=settings.AGENT_SANDBOX_DOCKER_REGISTRY_NAMESPACE,
+        type=RepositoryType.DOCKER,
+        public=False,
+    ),
 ]
 
 
