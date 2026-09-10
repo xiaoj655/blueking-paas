@@ -17,9 +17,10 @@
 
 import importlib
 import os
+import secrets
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
-os.environ.setdefault("PAAS_SERVICE_JWT_CLIENTS_KEY", "test-key")
+os.environ.setdefault("PAAS_SERVICE_JWT_CLIENTS_KEY", secrets.token_urlsafe(32))
 
 _base_settings = importlib.import_module("svc_otel.settings")
 globals().update(
