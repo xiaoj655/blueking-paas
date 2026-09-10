@@ -16,7 +16,7 @@
 # to the current version of the project delivered to anyone in the future.
 
 import logging
-from typing import Dict, Optional
+from typing import Dict
 
 from bkapi_client_core.exceptions import APIGatewayResponseError
 from django.conf import settings
@@ -24,7 +24,11 @@ from typing_extensions import Protocol
 
 from svc_otel.bkmonitorv3.backend.apigw import Client
 from svc_otel.bkmonitorv3.backend.esb import get_client_by_username
-from svc_otel.bkmonitorv3.exceptions import BkMonitorApiError, BkMonitorGatewayServiceError
+from svc_otel.bkmonitorv3.exceptions import (
+    BkMonitorApiError,
+    BkMonitorApmApplicationDoesNotExist,
+    BkMonitorGatewayServiceError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +36,9 @@ logger = logging.getLogger(__name__)
 class BkMonitorBackend(Protocol):
     """Describes protocols of calling API service"""
 
-    def apm_create_application(self, *args, **kwargs) -> Dict: ...
+    def apm_create_application(self, *, data: Dict) -> Dict: ...
 
-    def detail_apm_application(self, *args, **kwargs) -> Dict: ...
+    def detail_apm_application(self, *, data: Dict) -> Dict: ...
 
 
 class BkMonitorClient:
@@ -49,8 +53,8 @@ class BkMonitorClient:
     ):
         self.client = backend
 
-    def get_apm(self, apm_name: str, bk_monitor_space_id: str) -> Optional[str]:
-        """查询 APM 应用详情，存在则返回 data_token，不存在返回 None
+    def get_apm(self, apm_name: str, bk_monitor_space_id: str) -> str:
+        """查询 APM 应用详情并返回 data_token。
 
         文档: GET /app/apm/detail_apm_application/
         传参三选一：application_id，或 bk_biz_id + app_name，或 space_uid + app_name
@@ -68,10 +72,11 @@ class BkMonitorClient:
                 apm_name,
                 bk_monitor_space_id,
             )
-            return None
+            raise BkMonitorApmApplicationDoesNotExist(resp.get("message", "APM application does not exist"))
 
-        token = (resp.get("data") or {}).get("token")
-        if not token:
+        resp_data = resp.get("data")
+        token = resp_data.get("token") if isinstance(resp_data, dict) else None
+        if not isinstance(token, str) or not token:
             logger.error(
                 "APM application found but token is empty, resp: %s, apm_name: %s, space_uid: %s",
                 resp,
@@ -108,29 +113,31 @@ class BkMonitorClient:
         except APIGatewayResponseError as e:
             raise BkMonitorGatewayServiceError("Failed to create APM on BK Monitor") from e
 
-        if not resp["result"]:
+        if not resp.get("result"):
             logger.error(
-                f"Failed to create APM on BK Monitor, resp: {resp}, apm_name: {apm_name}, space_uid: {bk_monitor_space_id}"
+                "Failed to create APM on BK Monitor, resp: %s, apm_name: %s, space_uid: %s",
+                resp,
+                apm_name,
+                bk_monitor_space_id,
             )
-            raise BkMonitorApiError(resp["message"])
-        return resp["data"]
+            raise BkMonitorApiError(resp.get("message", "Failed to create APM on BK Monitor"))
+
+        token = resp.get("data")
+        if not isinstance(token, str) or not token:
+            raise BkMonitorApiError("APM application token is empty")
+        return token
 
     def get_or_create_apm(self, apm_name: str, bk_monitor_space_id: str) -> str:
         """先查 APM 应用，不存在再创建，返回 data_token"""
-        data_token = self.get_apm(apm_name, bk_monitor_space_id)
-        if data_token:
-            return data_token
-
         try:
+            return self.get_apm(apm_name, bk_monitor_space_id)
+        except BkMonitorApmApplicationDoesNotExist:
+            logger.info(
+                "APM application does not exist, creating it, apm_name: %s, space_uid: %s",
+                apm_name,
+                bk_monitor_space_id,
+            )
             return self.create_apm(apm_name, bk_monitor_space_id)
-        except BkMonitorApiError as e:
-            # 并发创建时可能已经存在，再查一次
-            if "已存在" not in str(e):
-                raise
-            data_token = self.get_apm(apm_name, bk_monitor_space_id)
-            if data_token:
-                return data_token
-            raise
 
 
 def make_bk_monitor_client(tenant_id) -> BkMonitorClient:

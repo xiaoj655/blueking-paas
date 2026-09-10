@@ -41,18 +41,17 @@ class Provider(BaseProvider):
     SERVICE_NAME = "otel"
 
     def _apply_data_token(self, bk_app_code: str, env: str, bk_monitor_space_id: str, tenant_id: str) -> ApmData:
-        """到蓝鲸监控 OTEL 服务给应用申请 data_token。
-
-        先调 detail_apm_application 查询，已存在则复用 token，不存在再创建。
-        本地已有记录时沿用当时的 app_name，兼容历史上带唯一后缀的名称。
-        """
+        """到蓝鲸监控 OTEL 服务给应用申请 data_token"""
         apm_data = ApmData.objects.filter(bk_app_code=bk_app_code, env=env).first()
-        app_name = apm_data.app_name if apm_data else _build_apm_app_name(bk_app_code, env)
+        if apm_data:
+            return apm_data
 
+        app_name = _build_apm_app_name(bk_app_code, env)
         client = make_bk_monitor_client(tenant_id)
         data_token = client.get_or_create_apm(app_name, bk_monitor_space_id)
 
-        apm_data, _c = ApmData.objects.update_or_create(
+        # 并发申请时优先沿用已写入的本地记录，避免覆盖有效 token
+        apm_data, _created = ApmData.objects.get_or_create(
             bk_app_code=bk_app_code, env=env, defaults={"data_token": data_token, "app_name": app_name}
         )
         return apm_data

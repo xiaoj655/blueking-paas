@@ -15,26 +15,17 @@
 # We undertake not to change the open source license (MIT license) applicable
 # to the current version of the project delivered to anyone in the future.
 
+import importlib
+import os
 
-class BkMonitorGatewayServiceError(Exception):
-    """This error indicates that there's something wrong when operating bk_monitor's
-    API Gateway resource. It's a wrapper class of API SDK's original exceptions
-    """
+os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+os.environ.setdefault("PAAS_SERVICE_JWT_CLIENTS_KEY", "test-key")
 
-    def __init__(self, message: str):
-        super().__init__(message)
-        self.message = message
-
-
-class BkMonitorApiError(BkMonitorGatewayServiceError):
-    """When calling the bk_monitor api, bk_monitor returns an error message,
-    which needs to be captured and displayed to the user on the page
-    """
-
-
-class BkMonitorApmApplicationDoesNotExist(BkMonitorApiError):
-    """The APM application does not exist in BK Monitor"""
-
-
-class BkMonitorSpaceDoesNotExist(BkMonitorApiError):
-    """The namespace applied to BK Monitoring does not exist"""
+_base_settings = importlib.import_module("svc_otel.settings")
+globals().update(
+    {
+        setting_name: getattr(_base_settings, setting_name)
+        for setting_name in dir(_base_settings)
+        if setting_name.isupper()
+    }
+)
