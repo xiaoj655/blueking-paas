@@ -33,7 +33,7 @@ curl -X GET -H 'X-Bkapi-Authorization: {"bk_app_code": "apigw-api-test", "bk_app
             "id": 1001,
             "bk_app_code": "appid1",
             "applied_by": "admin",
-            "applied_time": "2026-09-10 12:00:00",
+            "applied_time": "2024-03-15 12:00:00",
             "handled_by": [],
             "handled_time": null,
             "apply_status": "pending",
@@ -58,7 +58,7 @@ curl -X GET -H 'X-Bkapi-Authorization: {"bk_app_code": "apigw-api-test", "bk_app
 | results[].applied_by | string | 申请人 |
 | results[].applied_time | string | 申请时间 |
 | results[].handled_by | array | 审批人 |
-| results[].handled_time | string | 处理时间 |
+| results[].handled_time | string / null | 处理时间，待审批时为 null |
 | results[].apply_status | string | 申请状态：pending / approved / rejected / partial_approved |
 | results[].apply_status_display | string | 申请状态展示文案 |
 | results[].grant_dimension | string | 授权维度：resource / api |

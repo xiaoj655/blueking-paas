@@ -33,7 +33,7 @@ curl -X GET -H 'X-Bkapi-Authorization: {"bk_app_code": "apigw-api-test", "bk_app
             "id": 1001,
             "bk_app_code": "appid1",
             "applied_by": "admin",
-            "applied_time": "2026-09-10 12:00:00",
+            "applied_time": "2024-03-15 12:00:00",
             "handled_by": [],
             "handled_time": null,
             "apply_status": "pending",
@@ -58,7 +58,7 @@ curl -X GET -H 'X-Bkapi-Authorization: {"bk_app_code": "apigw-api-test", "bk_app
 | results[].applied_by | string | Applicant |
 | results[].applied_time | string | Apply time |
 | results[].handled_by | array | Approvers |
-| results[].handled_time | string | Handle time |
+| results[].handled_time | string / null | Handle time; null when still pending |
 | results[].apply_status | string | Status: pending / approved / rejected / partial_approved |
 | results[].apply_status_display | string | Status display text |
 | results[].grant_dimension | string | Grant dimension: resource / api |
