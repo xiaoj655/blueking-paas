@@ -109,6 +109,9 @@ VOLUME_SHARED_APP_CODES_MAX = 50
 # 上传临时 URL 的有效期，给 daemon 读大文件 + PUT 留足余量
 UPLOAD_URL_EXPIRES_IN = 3600
 
+# Volume 直传单文件上限。apiserver 转发时整个文件会读入内存, 因此低于常驻 daemon 的 100MB 兜底上限
+VOLUME_FILE_UPLOAD_MAX_BYTES = 30 * 1024 * 1024
+
 # bkrepo 临时 token 类型。预览页仅接受 PREVIEW 类型的 token（DOWNLOAD token 会被 bkrepo
 # preview 服务直接拒绝），因此不能复用签发下载 URL 的 generic/temporary/url/create
 PREVIEW_TOKEN_TYPE = "PREVIEW"

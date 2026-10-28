@@ -72,6 +72,11 @@ urlpatterns = [
         name="agent_sandbox.volume.files.download_url",
     ),
     path(
+        "api/agent_sandbox/applications/<slug:code>/volumes/<uuid:volume_id>/files/upload",
+        VolumeFileViewSet.as_view({"post": "upload"}),
+        name="agent_sandbox.volume.files.upload",
+    ),
+    path(
         "api/agent_sandbox/applications/<slug:code>/sandboxes/",
         AgentSandboxViewSet.as_view({"post": "create", "get": "list"}),
         name="agent_sandbox.create",

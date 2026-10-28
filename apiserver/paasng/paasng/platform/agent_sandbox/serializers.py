@@ -21,7 +21,6 @@ from django.conf import settings
 from rest_framework import serializers
 
 from paasng.platform.applications.models import Application
-from paasng.utils.serializers import SafePathField
 
 from .constants import (
     SANDBOX_DEFAULT_TTL_SECONDS,
@@ -85,6 +84,38 @@ class SandboxEnvVarsField(serializers.JSONField):
             self.fail("invalid_type")
         if any(not isinstance(key, str) or not isinstance(item, str) for key, item in value.items()):
             self.fail("invalid_item_type")
+        return value
+
+
+class VolumePathField(serializers.CharField):
+    """Volume 内相对路径。
+
+    比 SafePathField 宽松, 允许空格、括号等常见文件名字符; 越界访问最终由常驻 daemon 的 jail 拦截。
+    ``# ? %`` 拼进 bkrepo 归档对象的 URL 时不会被转义, 因此仍然禁止。
+    """
+
+    default_error_messages = {
+        "invalid_char": "path {path} contains forbidden characters (control characters, \\ # ? %)",
+        "escape_risk": "path {path} must be relative and must not contain '..'",
+        "segment_too_long": "each segment of path must not exceed 255 bytes",
+    }
+    forbidden_chars = re.compile(r"[\x00-\x1f\x7f\\#?%]")
+
+    def __init__(self, **kwargs):
+        # 与 VolumeArtifact.rel_path 的列长度一致
+        kwargs.setdefault("max_length", 700)
+        kwargs.setdefault("trim_whitespace", False)
+        super().__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data)
+        if self.forbidden_chars.search(value):
+            self.fail("invalid_char", path=value)
+        segments = value.split("/")
+        if value.startswith("/") or ".." in segments:
+            self.fail("escape_risk", path=value)
+        if any(len(segment.encode()) > 255 for segment in segments):
+            self.fail("segment_too_long")
         return value
 
 
@@ -260,7 +291,7 @@ class VolumeShareInputSLZ(serializers.Serializer):
 class VolumeFileListInputSLZ(serializers.Serializer):
     """列出 volume 内文件(分页)。"""
 
-    path = SafePathField(
+    path = VolumePathField(
         label="路径", required=False, default="", allow_blank=True, help_text="volume 内相对路径，默认根目录"
     )
     is_recursive = serializers.BooleanField(label="递归", required=False, default=False)
@@ -277,7 +308,7 @@ class VolumeFileListInputSLZ(serializers.Serializer):
 class VolumeFileItemOutputSLZ(serializers.Serializer):
     """列表/元数据中的单个文件条目。"""
 
-    path = SafePathField(label="文件路径")
+    path = serializers.CharField(label="文件路径")
     name = serializers.CharField(label="文件名")
     is_dir = serializers.BooleanField(label="是否目录")
     size = serializers.IntegerField(label="文件大小（字节）")
@@ -295,7 +326,7 @@ class VolumeFileListOutputSLZ(serializers.Serializer):
 class VolumeFileStatInputSLZ(serializers.Serializer):
     """查询 volume 内文件元数据。"""
 
-    path = SafePathField(label="路径", help_text="volume 内相对路径")
+    path = VolumePathField(label="路径", help_text="volume 内相对路径")
 
 
 class VolumeFileStatOutputSLZ(serializers.Serializer):
@@ -311,14 +342,14 @@ class VolumeFileStatOutputSLZ(serializers.Serializer):
 class VolumeFilePreviewInputSLZ(serializers.Serializer):
     """文本小段预览。"""
 
-    path = SafePathField(label="路径", help_text="volume 内相对路径")
+    path = VolumePathField(label="路径", help_text="volume 内相对路径")
     max_bytes = serializers.IntegerField(label="截断上限(字节)", required=False, default=65536, min_value=1)
 
 
 class VolumeFileDownloadURLInputSLZ(serializers.Serializer):
     """归档并签发下载/预览 URL"""
 
-    path = SafePathField(label="路径", help_text="volume 内相对路径")
+    path = VolumePathField(label="路径", help_text="volume 内相对路径")
     expires_in = serializers.IntegerField(label="有效期(秒)", required=False, default=600, min_value=1, max_value=3600)
 
 
@@ -335,7 +366,14 @@ class VolumeFileDownloadURLOutputSLZ(serializers.Serializer):
 class VolumeFileDeleteInputSLZ(serializers.Serializer):
     """删除 volume 内单个文件。"""
 
-    path = SafePathField(label="路径", help_text="volume 内相对路径")
+    path = VolumePathField(label="路径", help_text="volume 内相对路径")
+
+
+class VolumeFileUploadInputSLZ(serializers.Serializer):
+    """上传文件到 volume。不依赖沙箱, 由常驻 daemon 写入共享存储。"""
+
+    path = VolumePathField(label="路径", help_text="volume 内相对路径")
+    file = serializers.FileField(label="文件", help_text="待上传文件内容")
 
 
 class SandboxCreateFolderInputSLZ(serializers.Serializer):

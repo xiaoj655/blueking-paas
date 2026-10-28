@@ -3647,6 +3647,33 @@ paths:
           resourcePermissionRequired: true
         descriptionEn:
         noneSchema: true
+  /agent_sandbox/applications/{app_code}/volumes/{volume_id}/files/upload:
+    post:
+      operationId: upload_agent_sandbox_volume_file
+      description: 上传文件到 Agent 沙箱 Volume(不依赖沙箱, 同名覆盖)
+      tags:
+      - Agent沙箱相关接口
+      responses:
+        '204':
+          description: ''
+      x-bk-apigateway-resource:
+        isPublic: true
+        allowApplyPermission: true
+        matchSubpath: false
+        enableWebsocket: false
+        backend:
+          name: default
+          method: post
+          path: /backend/api/agent_sandbox/applications/{app_code}/volumes/{volume_id}/files/upload
+          matchSubpath: false
+          timeout: 300
+        pluginConfigs: []
+        authConfig:
+          userVerifiedRequired: true
+          appVerifiedRequired: true
+          resourcePermissionRequired: true
+        descriptionEn:
+        noneSchema: true
   /agent_sandbox/applications/{app_code}/volumes/{volume_id}/shares:
     post:
       operationId: share_agent_sandbox_volume

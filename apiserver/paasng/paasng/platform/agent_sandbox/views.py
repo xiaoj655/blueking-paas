@@ -42,7 +42,11 @@ from paasng.platform.agent_sandbox.artifact import (
     build_preview_url,
     delete_volume_artifact,
 )
-from paasng.platform.agent_sandbox.constants import SandboxDeleteSource, SandboxOperation
+from paasng.platform.agent_sandbox.constants import (
+    VOLUME_FILE_UPLOAD_MAX_BYTES,
+    SandboxDeleteSource,
+    SandboxOperation,
+)
 from paasng.platform.agent_sandbox.exceptions import (
     SandboxActiveCountLimitExceeded,
     SandboxAlreadyExists,
@@ -94,6 +98,7 @@ from paasng.platform.agent_sandbox.serializers import (
     VolumeFilePreviewInputSLZ,
     VolumeFileStatInputSLZ,
     VolumeFileStatOutputSLZ,
+    VolumeFileUploadInputSLZ,
     VolumeOutputSLZ,
     VolumeShareInputSLZ,
 )
@@ -249,8 +254,8 @@ class VolumeFileViewSet(viewsets.GenericViewSet, ApplicationCodeInPathMixin):
     """Volume 文件持久化相关接口
 
     面向 AIDev 前端提供沙箱销毁后仍可访问的产物文件的 列表 / 元数据 / 文本预览 /
-    下载(预览)URL / 删除。数据(下载)走 bkrepo 签名 URL直连, 归档由常驻 daemon
-    直连 bkrepo 上传,apiserver 仅编排、签发临时 URL。
+    下载(预览)URL / 删除 / 上传。数据(下载)走 bkrepo 签名 URL直连, 归档由常驻 daemon
+    直连 bkrepo 上传,apiserver 仅编排、签发临时 URL; 上传则由 apiserver 转发给常驻 daemon 写入共享存储。
 
     paas-apiserver --> 常驻 daemon --> bkrepo --> 响应
                             |
@@ -383,6 +388,28 @@ class VolumeFileViewSet(viewsets.GenericViewSet, ApplicationCodeInPathMixin):
 
         # 清理 bkrepo 对象 + 去重表记录, 避免下次归档命中陈旧映射 / "Node existed"
         delete_volume_artifact(volume, data["path"])
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @swagger_auto_schema(
+        tags=["agent_sandbox"], request_body=VolumeFileUploadInputSLZ(), responses={status.HTTP_204_NO_CONTENT: ""}
+    )
+    @handle_volume_file_errors("upload file")
+    def upload(self, request, code, volume_id):
+        """上传文件到 volume(同名覆盖), 不要求沙箱已创建。"""
+        volume = self._get_volume(volume_id)
+        # daemon 会按需创建卷目录, 删除中的卷若放行会在清理后重新建出孤儿目录
+        if volume.deleting_at is not None:
+            raise error_codes.AGENT_SANDBOX_VOLUME_NOT_FOUND
+        data = self._validate(VolumeFileUploadInputSLZ, request.data)
+
+        if data["file"].size > VOLUME_FILE_UPLOAD_MAX_BYTES:
+            raise error_codes.AGENT_SANDBOX_FILE_TOO_LARGE
+        try:
+            get_resident_daemon_client().upload(
+                base_path=volume.storage_path, rel_path=data["path"], file=data["file"]
+            )
+        except SandboxFileTooLarge:
+            raise error_codes.AGENT_SANDBOX_FILE_TOO_LARGE
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

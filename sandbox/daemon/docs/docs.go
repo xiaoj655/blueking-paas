@@ -371,6 +371,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/files/upload/": {
+            "post": {
+                "description": "Write the file to base_path/rel_path, creating the volume directory and parent directories when missing; an existing file is overwritten",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pv"
+                ],
+                "summary": "Upload a file into a volume",
+                "operationId": "PVUploadFile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "volume storage path issued by apiserver, must match app/{32 hex chars}",
+                        "name": "base_path",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "volume-relative destination path",
+                        "name": "rel_path",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/process/execute": {
             "post": {
                 "description": "Execute a shell command and return the output and exit code",

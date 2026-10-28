@@ -29,6 +29,17 @@ func openVolumeRoot(rootDir, basePath string) (*os.Root, error) {
 	return storageRoot.OpenRoot(basePath)
 }
 
+// ensureVolumeDir creates basePath below rootDir when missing, without following
+// symlinks out of the storage root.
+func ensureVolumeDir(rootDir, basePath string) error {
+	storageRoot, err := os.OpenRoot(rootDir)
+	if err != nil {
+		return err
+	}
+	defer storageRoot.Close() // nolint
+	return storageRoot.MkdirAll(basePath, 0o755)
+}
+
 // validateRootPath rejects names which are not contained in an os.Root.
 // Empty paths are represented by ".", the root directory itself.
 func validateRootPath(name string) (string, error) {

@@ -26,7 +26,7 @@ All path-taking operations take a ``base_path`` (the jail root, computed by apis
 """
 
 from datetime import datetime
-from typing import Any, NotRequired, TypedDict
+from typing import IO, Any, NotRequired, TypedDict
 
 import requests
 from django.conf import settings
@@ -42,6 +42,8 @@ from .exceptions import (
 from .utils import extract_error_detail
 
 DEFAULT_REQUEST_TIMEOUT = 60
+# 与网关上传资源的 timeout 对齐, 网关超时后继续转发已无意义
+UPLOAD_REQUEST_TIMEOUT = 300
 
 
 class FileItem(TypedDict):
@@ -136,6 +138,19 @@ class ResidentDaemonClient:
         """Delete a single file. Deleting a non-existent file is idempotent (success)."""
         params = {"base_path": base_path, "rel_path": rel_path}
         self._request("DELETE", "/files", params=params)
+
+    def upload(self, base_path: str, rel_path: str, file: IO[bytes]) -> None:
+        """Upload a file to base_path/rel_path, overwriting an existing file.
+
+        The daemon creates the volume directory and parent directories when missing.
+        """
+        self._request(
+            "POST",
+            "/files/upload",
+            files={"file": file},
+            data={"base_path": base_path, "rel_path": rel_path},
+            timeout=UPLOAD_REQUEST_TIMEOUT,
+        )
 
     def delete_volume(self, base_path: str) -> None:
         """Recursively delete one volume directory. Idempotent.

@@ -1739,6 +1739,7 @@ APIGW_GRANT_AGENT_SANDBOX_APIS: list[str] = settings.get(
         "preview_agent_sandbox_volume_file",
         "get_agent_sandbox_volume_file_download_url",
         "delete_agent_sandbox_volume_file",
+        "upload_agent_sandbox_volume_file",
     ],
 )
 

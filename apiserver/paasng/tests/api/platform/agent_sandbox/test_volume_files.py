@@ -19,7 +19,9 @@ from typing import Any
 from unittest import mock
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -261,6 +263,96 @@ class TestVolumeFileViewSet:
         resp2 = api_client.delete(f"{url}?path=report.html")
         assert resp2.status_code == status.HTTP_204_NO_CONTENT
 
+    def test_upload_then_stat(self, api_client: APIClient, volume: Volume, stub_resident_client) -> None:
+        url = reverse(
+            "agent_sandbox.volume.files.upload",
+            kwargs={"code": volume.application.code, "volume_id": volume.uuid},
+        )
+        resp = api_client.post(
+            url,
+            data={"path": "outputs/readme.txt", "file": SimpleUploadedFile("readme.txt", b"hello-pv")},
+            format="multipart",
+        )
+        assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+        stat = stub_resident_client.stat(volume.storage_path, "outputs/readme.txt")
+        assert stat["exists"] is True
+        assert stat["size"] == len(b"hello-pv")
+
+    def test_upload_accepts_file_name_with_spaces(
+        self, api_client: APIClient, volume: Volume, stub_resident_client
+    ) -> None:
+        url = reverse(
+            "agent_sandbox.volume.files.upload",
+            kwargs={"code": volume.application.code, "volume_id": volume.uuid},
+        )
+        resp = api_client.post(
+            url,
+            data={"path": "outputs/报告 (1).pdf", "file": SimpleUploadedFile("报告 (1).pdf", b"%PDF")},
+            format="multipart",
+        )
+        assert resp.status_code == status.HTTP_204_NO_CONTENT
+        assert stub_resident_client.stat(volume.storage_path, "outputs/报告 (1).pdf")["exists"] is True
+
+    def test_upload_rejects_path_escape(self, api_client: APIClient, volume: Volume) -> None:
+        url = reverse(
+            "agent_sandbox.volume.files.upload",
+            kwargs={"code": volume.application.code, "volume_id": volume.uuid},
+        )
+        resp = api_client.post(
+            url,
+            data={"path": "../secret.txt", "file": SimpleUploadedFile("secret.txt", b"x")},
+            format="multipart",
+        )
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_upload_too_large_returns_413(self, api_client: APIClient, volume: Volume) -> None:
+        url = reverse(
+            "agent_sandbox.volume.files.upload",
+            kwargs={"code": volume.application.code, "volume_id": volume.uuid},
+        )
+        with mock.patch("paasng.platform.agent_sandbox.views.VOLUME_FILE_UPLOAD_MAX_BYTES", 1):
+            resp = api_client.post(
+                url, data={"path": "big.bin", "file": SimpleUploadedFile("big.bin", b"xx")}, format="multipart"
+            )
+        assert resp.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+        assert resp.json()["code"] == "AGENT_SANDBOX_FILE_TOO_LARGE"
+
+    def test_upload_to_deleting_volume_returns_404(
+        self, api_client: APIClient, volume: Volume, stub_resident_client
+    ) -> None:
+        """删除中的卷不能上传, 否则 daemon 会在清理后重新建出卷目录。"""
+        volume.deleting_at = timezone.now()
+        volume.save(update_fields=["deleting_at"])
+        url = reverse(
+            "agent_sandbox.volume.files.upload",
+            kwargs={"code": volume.application.code, "volume_id": volume.uuid},
+        )
+        resp = api_client.post(
+            url, data={"path": "a.txt", "file": SimpleUploadedFile("a.txt", b"x")}, format="multipart"
+        )
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+        assert resp.json()["code"] == "AGENT_SANDBOX_VOLUME_NOT_FOUND"
+        assert stub_resident_client.stat(volume.storage_path, "a.txt")["exists"] is False
+
+    def test_upload_onto_directory_returns_400(
+        self, api_client: APIClient, volume: Volume, stub_resident_client
+    ) -> None:
+        """daemon 拒绝覆盖目录(400)时应映射为 FILE_OPERATION_FAILED。"""
+        err = SandboxDaemonAPIError(
+            "HTTP error 400 on /files/upload", status_code=400, detail='cannot overwrite a directory: "outputs"'
+        )
+        url = reverse(
+            "agent_sandbox.volume.files.upload",
+            kwargs={"code": volume.application.code, "volume_id": volume.uuid},
+        )
+        with mock.patch.object(stub_resident_client, "upload", side_effect=err):
+            resp = api_client.post(
+                url, data={"path": "outputs", "file": SimpleUploadedFile("outputs", b"x")}, format="multipart"
+            )
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST
+        assert resp.json()["code"] == "AGENT_SANDBOX_FILE_OPERATION_FAILED"
+
 
 @pytest.mark.usefixtures("_mock_app_mismatch_permission", "stub_resident_client")
 class TestVolumeFilePermission:
@@ -272,6 +364,19 @@ class TestVolumeFilePermission:
         )
         resp = api_client.get(list_url, data={"path": ""})
         assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_upload_forbidden_on_app_mismatch(
+        self, api_client: APIClient, volume: Volume, stub_resident_client
+    ) -> None:
+        url = reverse(
+            "agent_sandbox.volume.files.upload",
+            kwargs={"code": volume.application.code, "volume_id": volume.uuid},
+        )
+        resp = api_client.post(
+            url, data={"path": "a.txt", "file": SimpleUploadedFile("a.txt", b"x")}, format="multipart"
+        )
+        assert resp.status_code == status.HTTP_403_FORBIDDEN
+        assert stub_resident_client.stat(volume.storage_path, "a.txt")["exists"] is False
 
 
 @pytest.mark.usefixtures("_mock_verified_app_permission", "stub_resident_client")

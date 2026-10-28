@@ -25,11 +25,56 @@ from paasng.platform.agent_sandbox.serializers import (
     SandboxEnvVarsField,
     SandboxListQuerySLZ,
     SandboxVolumeMountInputSLZ,
+    VolumePathField,
 )
 
 
 class DummyEnvSerializer(serializers.Serializer):
     env_vars = SandboxEnvVarsField(required=False, default=dict)
+
+
+class DummyVolumePathSerializer(serializers.Serializer):
+    path = VolumePathField()
+
+
+class TestVolumePathField:
+    @pytest.mark.parametrize(
+        "path",
+        [
+            "报告 (1).pdf",
+            "outputs/a&b+c@d!e,f;g=h~i'j[k]{l}.txt",
+            " leading-space.txt",
+            "v1..2/notes.md",
+            "a" * 255,
+        ],
+    )
+    def test_accepts_common_file_names(self, path):
+        slz = DummyVolumePathSerializer(data={"path": path})
+
+        slz.is_valid(raise_exception=True)
+        assert slz.validated_data["path"] == path
+
+    @pytest.mark.parametrize(
+        "path",
+        [
+            "../secret.txt",
+            "outputs/../../secret.txt",
+            "/etc/passwd",
+            "a#b.txt",
+            "a?b.txt",
+            "50%.txt",
+            "a\\b.txt",
+            "a\nb.txt",
+            "a\x00b.txt",
+            "a" * 256,
+            "汉" * 86,
+            "a/" * 350 + "b",
+        ],
+    )
+    def test_rejects_unsafe_paths(self, path):
+        slz = DummyVolumePathSerializer(data={"path": path})
+
+        assert not slz.is_valid()
 
 
 def test_env_vars_must_be_object():
