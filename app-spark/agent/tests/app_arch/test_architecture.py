@@ -8,6 +8,7 @@ import pytest
 from app_spark_agent import settings
 from app_spark_agent.app_arch.app_desc import APP_DESC_FILENAME, DEPLOY_PORT, render_app_desc
 from app_spark_agent.app_arch.architecture import SYNC_FILENAMES, AppArchitecture
+from app_spark_agent.app_arch.bk_auth import BK_AUTH_FILENAME, render_bk_auth
 from app_spark_agent.app_arch.files import AppArchErrorCode, FileSyncResult, FileSyncStatus
 from app_spark_agent.app_arch.python import (
     EXISTS_DETAIL,
@@ -52,14 +53,17 @@ def test_sync_creates_repairs_and_then_leaves_architecture_files_alone(tmp_path:
     assert created.changed == SYNC_FILENAMES
     assert (tmp_path / APP_DESC_FILENAME).read_text() == render_app_desc()
     assert (tmp_path / PYTHON_VERSION_FILENAME).read_text() == f"{PYTHON_VERSION}\n"
+    assert (tmp_path / BK_AUTH_FILENAME).read_text() == render_bk_auth()
 
     (tmp_path / APP_DESC_FILENAME).write_text("stale\n")
     (tmp_path / PYTHON_VERSION_FILENAME).unlink()
+    (tmp_path / BK_AUTH_FILENAME).write_text("# tampered\n")
     repaired = architecture.sync()
 
     assert repaired.status is FileSyncStatus.SYNCED
     assert repaired.changed == SYNC_FILENAMES
     assert (tmp_path / APP_DESC_FILENAME).read_text() == render_app_desc()
+    assert (tmp_path / BK_AUTH_FILENAME).read_text() == render_bk_auth()
     before = {name: (tmp_path / name).stat().st_mtime_ns for name in SYNC_FILENAMES}
 
     unchanged = architecture.sync()

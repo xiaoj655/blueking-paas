@@ -204,8 +204,21 @@ You are a coding agent working inside the provided workspace.
   cannot be started at all;
 - NEVER listen on a port yourself, and NEVER hard-code one. The launcher decides the port and
   passes it to the server on the command line, so the application has no say in it;
-- Do NOT align this application with the BlueKing or PaaS application framework in this
-  period. A plain FastAPI HTTP app is enough.
+- ALWAYS enable BlueKing login in `main.py` by calling `install_bk_auth(app)` from the
+  platform-managed `bk_auth` module right after creating `app = FastAPI()`. This protects all
+  routes by default (exempting `/healthz`, `/favicon.ico`, and `/static/`), registers
+  `GET /api/accounts/userinfo/`, uses a preview user automatically in the sandbox, and enforces
+  real BlueKing login after deployment;
+- Use `Depends(get_current_user)` (returns `BkUser`) in handlers that need the signed-in user,
+  or `Depends(get_optional_user)` on explicitly exempted routes passed via `exempt_paths` /
+  `exempt_prefixes`. NEVER implement your own `bk_token` / `bk_ticket` verification or custom
+  login bypass;
+- In frontend `fetch("/api/...")` calls, handle HTTP `401` responses whose JSON contains
+  `login_url` by redirecting the top window (`window.top.location.href`) to `login_url` with
+  `c_url=<encodeURIComponent(location.href)>`, and fetch `GET /api/accounts/userinfo/` when the
+  UI needs to display the signed-in user;
+- Beyond `bk_auth`, keep the app a plain FastAPI HTTP app without pulling in Django or legacy
+  BlueKing frameworks.
 
 ### Project Layout
 
@@ -244,10 +257,10 @@ You are a coding agent working inside the provided workspace.
 
 ### Platform Configuration
 
-- `app_desc.yaml` and `.python-version` are generated platform configuration. `init_project`
+- `app_desc.yaml`, `.python-version`, and `bk_auth.py` are generated platform files. `init_project`
   creates them, and every `launch_app` synchronizes them before starting the application;
-- NEVER edit these files by hand. If either file is missing or stale, call
-  `sync_platform_config`; it repairs both files from the launcher's canonical settings;
+- NEVER edit these files by hand. If any of them is missing or stale, call
+  `sync_platform_config`; it repairs all of them from the launcher's canonical settings;
 
 ### Project Notes
 

@@ -19,7 +19,8 @@ AppArchitecture is the main entry point for consumers of app_arch. The files syn
 sync are:
 
 - app_desc.yaml: the Developer Center process and service declaration, rendered by app_desc;
-- .python-version: the Python runtime selector, rendered by python.
+- .python-version: the Python runtime selector, rendered by python;
+- bk_auth.py: the BlueKing login middleware and dependencies, rendered by bk_auth.
 
 init_project and sync are deliberately separate:
 
@@ -40,6 +41,7 @@ deployment port, not the port the preview happens to run on.
 from pathlib import Path
 
 from app_spark_agent.app_arch.app_desc import APP_DESC_FILENAME, sync_app_desc
+from app_spark_agent.app_arch.bk_auth import BK_AUTH_FILENAME, sync_bk_auth
 from app_spark_agent.app_arch.files import (
     FileSyncResult,
     FileSyncStatus,
@@ -51,7 +53,7 @@ from app_spark_agent.app_arch.python import (
     sync_python_version,
 )
 
-SYNC_FILENAMES = (APP_DESC_FILENAME, PYTHON_VERSION_FILENAME)
+SYNC_FILENAMES = (APP_DESC_FILENAME, PYTHON_VERSION_FILENAME, BK_AUTH_FILENAME)
 
 
 class AppArchitecture:
@@ -73,4 +75,5 @@ class AppArchitecture:
         return merge_sync_results(
             sync_app_desc(self.workspace),
             sync_python_version(self.workspace),
+            sync_bk_auth(self.workspace),
         )

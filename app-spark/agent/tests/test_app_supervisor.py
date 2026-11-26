@@ -31,11 +31,13 @@ import pytest
 
 from app_spark_agent import settings
 from app_spark_agent.app_arch.app_desc import render_app_desc
+from app_spark_agent.app_arch.bk_auth import BK_AUTH_FILENAME, render_bk_auth
 from app_spark_agent.app_arch.files import AppArchErrorCode, FileSyncResult, FileSyncStatus
 from app_spark_agent.app_arch.python import APP_IMPORT_PATH, PYTHON_VERSION
 from app_spark_agent.app_supervisor import (
     APP_PORT_ENV,
     LAUNCH_EVENT_RUN_ID,
+    PREVIEW_MODE_ENV,
     AppLaunchConflict,
     AppLaunchFailed,
     AppSupervisor,
@@ -192,6 +194,8 @@ def test_child_env_drops_every_agent_setting_not_just_the_known_secrets() -> Non
     assert "APP_SPARK_AGENT_WORKSPACE" not in env
     # 唯一加回来的一项，尽管它也带前缀。
     assert env[APP_PORT_ENV] == "8123"
+    # 预览标记只给沙箱拉起的应用子进程，供 bk_auth.py 识别预览态。
+    assert env[PREVIEW_MODE_ENV] == "1"
 
 
 def test_child_env_activates_the_projects_venv_instead_of_the_agents(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -237,11 +241,13 @@ async def test_launch_repairs_platform_configuration_before_spawning(
     app = App(monkeypatch, tmp_path)
     workspace = tmp_path / "workspace"
     (workspace / "app_desc.yaml").write_text("stale\n")
+    (workspace / BK_AUTH_FILENAME).write_text("# tampered\n")
 
     await app.supervisor.restart()
 
     assert (workspace / "app_desc.yaml").read_text() == render_app_desc()
     assert (workspace / ".python-version").read_text() == f"{PYTHON_VERSION}\n"
+    assert (workspace / BK_AUTH_FILENAME).read_text() == render_bk_auth()
     assert len(app.spawned) == 1
 
 

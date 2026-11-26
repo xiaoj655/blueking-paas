@@ -419,12 +419,7 @@ def test_the_model_creates_the_project_with_init_project(make_api: ApiFactory, t
             "detail": "Created Python project todo-board.",
         }
     ]
-    assert sorted(path.name for path in workspace.iterdir() if path.name != ".git") == [
-        ".python-version",
-        "app_desc.yaml",
-        "pyproject.toml",
-        "uv.lock",
-    ]
+    assert sorted(path.name for path in workspace.iterdir() if path.name != ".git") == sorted(initialized_files)
 
 
 def test_a_failed_run_does_not_clear_readiness(make_api: ApiFactory) -> None:

@@ -71,6 +71,9 @@ PORT_FREE_TIMEOUT_SECONDS = 5.0
 # 注入给子进程的端口。应用不靠它选端口，监听端口由启动命令决定。
 APP_PORT_ENV = f"{settings.ENV_PREFIX}APP_PORT"
 
+# 显式告知沙箱里的用户应用当前处于预览态。仅在没有 BKPAAS_APP_ID 时由 bk_auth 生效。
+PREVIEW_MODE_ENV = "APP_SPARK_PREVIEW_MODE"
+
 # 只落盘给控制面 drain，不往进行中的 /runs SSE 里插。
 LAUNCHED_EVENT_NAME = "app.launched"
 

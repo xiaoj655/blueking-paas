@@ -16,6 +16,7 @@
 """Reusable definitions for the technical architecture of Agent-built applications.
 
 files defines the shared write/result protocol. python owns the language runtime and Python
-project layout. app_desc owns the Developer Center deployment manifest. architecture exposes the
-AppArchitecture entry point used by model tools and the application supervisor.
+project layout. app_desc owns the Developer Center deployment manifest. bk_auth owns the
+platform-managed BlueKing login module. architecture exposes the AppArchitecture entry point
+used by model tools and the application supervisor.
 """

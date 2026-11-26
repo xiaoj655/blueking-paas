@@ -40,7 +40,8 @@ def build_init_project_tool(workspace: Path) -> Callable[[str], FileSyncResult]:
 
         Call this once, before writing the application's first file. It writes `pyproject.toml`
         and `uv.lock` with the starting dependencies already locked, plus the platform-owned
-        `app_desc.yaml` and `.python-version` files required for deployment.
+        `app_desc.yaml`, `.python-version`, and `bk_auth.py` files required for deployment and
+        BlueKing login.
         When `pyproject.toml` already exists it keeps the project files as they are and only
         repairs the platform files; a `uv.lock` left without one is replaced.
 

@@ -24,7 +24,7 @@ from app_spark_agent import settings
 from app_spark_agent.app_arch.python import build_uvicorn_args
 from app_spark_agent.app_supervisor.process import ProcessSpec
 from app_spark_agent.app_supervisor.project_env import project_python, project_venv, strip_agent_environ
-from app_spark_agent.app_supervisor.types import APP_PORT_ENV
+from app_spark_agent.app_supervisor.types import APP_PORT_ENV, PREVIEW_MODE_ENV
 
 
 def build_app_spec(workspace: Path, port: int) -> ProcessSpec:
@@ -58,4 +58,6 @@ def build_child_environ(workspace: Path, port: int, source: Mapping[str, str] | 
 
     # 应用自己不选端口。加在剥离之后，这个 key 本身带前缀。
     env[APP_PORT_ENV] = str(port)
+    # 显式标记沙箱预览态，供平台同步的 bk_auth.py 区分预览与线上部署。
+    env[PREVIEW_MODE_ENV] = "1"
     return env

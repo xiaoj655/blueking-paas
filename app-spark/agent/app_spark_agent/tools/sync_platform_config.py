@@ -27,11 +27,11 @@ def build_sync_platform_config_tool(workspace: Path) -> Callable[[], FileSyncRes
     architecture = AppArchitecture(workspace)
 
     def sync_platform_config() -> FileSyncResult:
-        """Create or repair the platform-owned files required to deploy this application.
+        """Create or repair the platform-owned files required to deploy and authenticate this application.
 
         Takes no arguments. It synchronizes `app_desc.yaml` with the platform's deployment command
-        and port, and pins `.python-version` to the supported Python runtime. Do not edit either
-        generated file by hand.
+        and port, pins `.python-version` to the supported Python runtime, and keeps `bk_auth.py`
+        aligned with the platform's BlueKing login module. Do not edit these generated files by hand.
         """
         return architecture.sync()
 
